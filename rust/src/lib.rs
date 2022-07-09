@@ -1,4 +1,3 @@
-use rand;
 use rand::distributions::Distribution;
 
 fn generate_random_name() -> String {
