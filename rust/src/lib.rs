@@ -16,6 +16,7 @@ fn generate_random_name() -> String {
     format!("{}{:03}", res, n)
 }
 
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub struct RobotName(String);
 
 impl FromStr for RobotName {
@@ -62,8 +63,8 @@ impl Robot {
         Self { name: None }
     }
 
-    pub fn name(&self) -> Option<&str> {
-        self.name.as_ref().map(|x| x.as_ref())
+    pub fn name(&self) -> Option<&RobotName> {
+        self.name.as_ref()
     }
 
     pub fn stop(&mut self) {}
@@ -103,23 +104,23 @@ mod tests {
         let mut robot = Robot::new();
 
         robot.start();
-        let name1 = robot.name().unwrap().to_owned();
+        let name1 = robot.name().unwrap().clone();
         robot.stop();
         robot.start();
         let name2 = robot.name().unwrap();
 
-        assert_eq!(name1, name2);
+        assert_eq!(&name1, name2);
     }
     #[test]
     fn name_changes_after_a_reset() {
         let mut robot = Robot::new();
         robot.start();
-        let name1 = robot.name().unwrap().to_owned();
+        let name1 = robot.name().unwrap().clone();
 
         robot.reset();
         robot.start();
 
         let name2 = robot.name().unwrap();
-        assert_ne!(name1, name2);
+        assert_ne!(&name1, name2);
     }
 }
