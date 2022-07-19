@@ -25,7 +25,7 @@ impl FromStr for RobotName {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let len = s.len();
         if len != 5 {
-            return Err(format!("Expecting string of size 6, got {len}"));
+            return Err(format!("Expecting string of size 5, got {len}"));
         }
         let chars: Vec<_> = s.chars().collect();
         for i in 0..2 {
@@ -85,6 +85,20 @@ impl Robot {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn invalid_formats_are_rejected() {
+        let err = "abc12".parse::<RobotName>().unwrap_err();
+        assert!(err.to_string().contains("At index 0"), "{}", err);
+
+        let err = "ABC123".parse::<RobotName>().unwrap_err();
+        assert!(
+            err.to_string()
+                .contains("Expecting string of size 5, got 6"),
+            "{}",
+            err
+        );
+    }
 
     #[test]
     fn name_is_not_set_at_frst() {
