@@ -14,35 +14,29 @@ fn generate_random_name() -> String {
     format!("{}{:03}", res, n)
 }
 
-pub struct NamedRobot {
-    name: String,
+pub struct Robot {
+    name: Option<String>,
 }
 
-pub struct UnnamedRobot {}
+impl Robot {
+    pub fn new() -> Self {
+        Self { name: None }
+    }
 
-pub fn new_robot() -> UnnamedRobot {
-    UnnamedRobot {}
-}
-
-impl NamedRobot {
-    pub fn name(&self) -> &str {
+    pub fn name(&self) -> &Option<String> {
         &self.name
     }
 
-    pub fn stop(&self) {}
+    pub fn stop(&mut self) {}
 
-    pub fn start(&self) {}
-
-    pub fn reset(self) -> UnnamedRobot {
-        UnnamedRobot {}
-    }
-}
-
-impl UnnamedRobot {
-    pub fn start(self) -> NamedRobot {
-        NamedRobot {
-            name: generate_random_name(),
+    pub fn start(&mut self) {
+        if self.name.is_none() {
+            self.name = Some(generate_random_name())
         }
+    }
+
+    pub fn reset(&mut self) {
+        self.name = None
     }
 }
 
@@ -52,40 +46,38 @@ mod tests {
 
     #[test]
     fn name_is_not_set_at_frst() {
-        let _robot = new_robot();
-        // robot.name() // does not compile: method name() not found for UnnamedRobot
+        let robot = Robot::new();
+        assert!(robot.name().is_none())
     }
 
     #[test]
     fn started_robots_have_a_name() {
-        let robot = new_robot();
-        let robot = robot.start();
-        assert!(robot.name() != "");
+        let mut robot = Robot::new();
+        robot.start();
+        assert!(robot.name().is_some());
     }
 
     #[test]
     fn name_does_not_change_when_rebooted() {
-        let robot = new_robot();
-        let named_robot = robot.start();
-        let name1 = named_robot.name();
-        named_robot.stop();
-        named_robot.start();
-        let name2 = named_robot.name();
+        let mut robot = Robot::new();
+
+        robot.start();
+        let name1 = robot.name().to_owned();
+        robot.stop();
+        robot.start();
+        let name2 = robot.name().to_owned();
+
         assert_eq!(name1, name2);
     }
     #[test]
     fn name_changes_after_a_reset() {
-        let robot = new_robot();
-        let robot = robot.start();
-        let name1 = robot.name().to_string();
+        let mut robot = Robot::new();
+        robot.start();
+        let name1 = robot.name().to_owned();
 
-        // robot.reset();
-        // robot.name(); // does not compile: value moved in reset()
+        robot.reset();
 
-        let robot = robot.reset();
-        // robot.name() does not compile: method name() not found for  UnnamedRobot
-        let robot = robot.start();
-        let name2 = robot.name().to_string();
-        assert_ne!(name1, name2);
+        let name2 = robot.name();
+        assert_ne!(&name1, name2);
     }
 }
