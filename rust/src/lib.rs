@@ -23,8 +23,8 @@ impl Robot {
         Self { name: None }
     }
 
-    pub fn name(&self) -> &Option<String> {
-        &self.name
+    pub fn name(&self) -> Option<&str> {
+        self.name.as_ref().map(|x| x.as_ref())
     }
 
     pub fn stop(&mut self) {}
@@ -62,10 +62,10 @@ mod tests {
         let mut robot = Robot::new();
 
         robot.start();
-        let name1 = robot.name().to_owned();
+        let name1 = robot.name().unwrap().to_owned();
         robot.stop();
         robot.start();
-        let name2 = robot.name().to_owned();
+        let name2 = robot.name().unwrap();
 
         assert_eq!(name1, name2);
     }
@@ -73,11 +73,12 @@ mod tests {
     fn name_changes_after_a_reset() {
         let mut robot = Robot::new();
         robot.start();
-        let name1 = robot.name().to_owned();
+        let name1 = robot.name().unwrap().to_owned();
 
         robot.reset();
+        robot.start();
 
-        let name2 = robot.name();
-        assert_ne!(&name1, name2);
+        let name2 = robot.name().unwrap();
+        assert_ne!(name1, name2);
     }
 }
