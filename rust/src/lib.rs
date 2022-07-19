@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use rand::distributions::Distribution;
 
 fn generate_random_name() -> String {
@@ -14,8 +16,45 @@ fn generate_random_name() -> String {
     format!("{}{:03}", res, n)
 }
 
+pub struct RobotName(String);
+
+impl FromStr for RobotName {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let len = s.len();
+        if len != 5 {
+            return Err(format!("Expecting string of size 6, got {len}"));
+        }
+        let chars: Vec<_> = s.chars().collect();
+        for i in 0..2 {
+            let c = &chars[i];
+            if !c.is_ascii_uppercase() {
+                return Err(format!(
+                    "At index {i} - expecting ASCII upper case, got {c}"
+                ));
+            }
+        }
+        for i in 3..5 {
+            let c = &chars[i];
+            if !c.is_ascii_digit() {
+                return Err(format!(
+                    "At index {i} - expecting ASCII upper case, got {c}"
+                ));
+            }
+        }
+        Ok(Self(s.to_string()))
+    }
+}
+
+impl AsRef<str> for RobotName {
+    fn as_ref(&self) -> &str {
+        self.0.as_ref()
+    }
+}
+
 pub struct Robot {
-    name: Option<String>,
+    name: Option<RobotName>,
 }
 
 impl Robot {
@@ -30,8 +69,10 @@ impl Robot {
     pub fn stop(&mut self) {}
 
     pub fn start(&mut self) {
+        let random_string = generate_random_name();
+        let name: RobotName = random_string.parse().expect("random names should be valid");
         if self.name.is_none() {
-            self.name = Some(generate_random_name())
+            self.name = Some(name)
         }
     }
 
