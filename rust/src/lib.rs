@@ -14,14 +14,23 @@ fn generate_random_name() -> String {
     format!("{}{:03}", res, n)
 }
 
-pub struct NamedRobot {
-    name: String,
+pub fn new_robot() -> UnnamedRobot {
+    UnnamedRobot {}
 }
 
 pub struct UnnamedRobot {}
 
-pub fn new_robot() -> UnnamedRobot {
-    UnnamedRobot {}
+impl UnnamedRobot {
+    #[must_use]
+    pub fn start(self) -> NamedRobot {
+        NamedRobot {
+            name: generate_random_name(),
+        }
+    }
+}
+
+pub struct NamedRobot {
+    name: String,
 }
 
 impl NamedRobot {
@@ -33,16 +42,9 @@ impl NamedRobot {
 
     pub fn start(&self) {}
 
+    #[must_use]
     pub fn reset(self) -> UnnamedRobot {
         UnnamedRobot {}
-    }
-}
-
-impl UnnamedRobot {
-    pub fn start(self) -> NamedRobot {
-        NamedRobot {
-            name: generate_random_name(),
-        }
     }
 }
 
